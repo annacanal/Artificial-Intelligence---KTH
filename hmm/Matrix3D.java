@@ -1,15 +1,27 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package hmm;
 
-final public class Matrix {
+/**
+ *
+ * @author USUARIO
+ */
+final public class Matrix3D {
+
     private final int M;             // number of rows
     private final int N;             // number of columns
-    private final double[][] data;   // M-by-N array
+    private final int L;             // number of columns
+    private final double[][][] data;   // M-by-N array
 
-    // CONSTRUCTOR: create M-by-N matrix of 0's
-    public Matrix(int M, int N) {
+    // CONSTRUCTOR: create M-by-N-by-L matrix of 0's
+    public Matrix3D(int M, int N, int L) {
         this.M = M;
         this.N = N;
-        data = new double[M][N];
+        this.L = L;
+        data = new double[M][N][L];
     }
 
     // GETTERS
@@ -21,14 +33,11 @@ final public class Matrix {
         return this.N;
     }
     
-    public int getIntElement (int row, int col){
-        return (int) this.data[row][col];
+   
+    public double getElement (int row, int col, int l){
+        return data[row][col][l];
     }
-    
-    public double getElement (int row, int col){
-        return data[row][col];
-    }
-    
+    /*
     public Matrix getColumn (int col){
         Matrix A = new Matrix(this.M, 1);
         for (int i=0; i < M; i++){
@@ -37,16 +46,16 @@ final public class Matrix {
         return A;
     }
     
-    
+    */
     // SETTERS
-    public void setValue(int x, int y, double value){
-        data[x][y] = value;
+    public void setValue(int x, int y, int z, double value){
+        data[x][y][z] = value;
     }
     
-
+    
     // METHODS
     // fill matrix with values from String []
-    public void fillMatrix (String [] buf, int start_data){
+    /*public void fillMatrix (String [] buf, int start_data){
         for (int i=0; i < M; i++){
             for (int j=0; j< N; j++){
                     data[i][j]= Double.parseDouble(buf[start_data]);
@@ -234,15 +243,15 @@ final public class Matrix {
         System.out.print(M+" "+ N+" ");
         for (int i = 0; i < M; i++) {
             for (int j = 0; j < N; j++) 
-                solution += data[i][j] + " ";
+                solution += this.getIntElement(i, j) + " ";
         }
-        System.out.println(solution);
+        System.out.print(solution);
         solution = "";
         System.out.print(B.getRows()+" "+ B.getCols()+" ");
         for (int i = 0; i < B.getRows(); i++) {
             for (int j = 0; j <  B.getCols(); j++) 
-                solution += B.getElement(i, j) + " ";
+                solution += B.getIntElement(i, j) + " ";
         }
-        System.out.println(solution);
-    }
+        System.out.print(solution);
+    }*/
 }

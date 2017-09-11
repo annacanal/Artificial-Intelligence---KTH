@@ -8,7 +8,9 @@ public class HMM {
     public static void main(String[] args) {
         
         //HMM0.solve_hmm0();
-        HMM1.solve_hmm1();
+        //HMM1.solve_hmm1();
+        //HMM2.solve_hmm2();
+        HMM3.solve_hmm3();
         
     }
     
