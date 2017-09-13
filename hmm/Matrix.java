@@ -88,15 +88,19 @@ final public class Matrix {
         return C;
     }
 
-    // return C = log(A) + log(B) = log (A·B)
+    // return C = A + log(B) 
     public Matrix plus_column_log(Matrix B,  int col) {
         Matrix A = this;
-        if (B.M != A.M || B.N != A.N) throw new RuntimeException("Illegal matrix dimensions.");
-        Matrix C = new Matrix(M, N);
-        for (int i = 0; i < M; i++)
-        	C.data[i][col] = Math.log(A.data[i][col]) + Math.log(B.data[i][col]);
+       // if (B.M != A.M || B.N != A.N) throw new RuntimeException("Illegal matrix dimensions.");
+        Matrix C = new Matrix(B.M, 1);
+        for (int i = 0; i < B.M; i++){
+        	C.data[i][0] = A.data[i][0] + Math.log10(B.data[i][col]);
+    	}
         return C;
     }
+    
+
+    
 
     // return C = A - B
     public Matrix minus(Matrix B) {
@@ -139,7 +143,7 @@ final public class Matrix {
         for (int i = 0; i < C.M; i++)
             for (int j = 0; j < C.N; j++)
                 for (int k = 0; k < A.N; k++)
-                    C.data[i][j] += Math.log((A.data[i][k] * B.data[k][j]));
+                    C.data[i][j] += Math.log(A.data[i][k]) + Math.log(B.data[k][j]);
         return C;
     }
     
@@ -168,7 +172,7 @@ final public class Matrix {
         }
         Matrix C = new Matrix (B.M, 1);
         for (int i = 0; i< B.M; i++){
-            C.data[i][0] = Math.log (A.data[i][0] * B.data[i][col]);
+            C.data[i][0] = Math.log10(A.data[i][0]* B.data[i][col]);
         }
         return C;
     }
@@ -234,15 +238,15 @@ final public class Matrix {
         System.out.print(M+" "+ N+" ");
         for (int i = 0; i < M; i++) {
             for (int j = 0; j < N; j++) 
-                solution += data[i][j] + " ";
+                solution += this.getIntElement(i, j) + " ";
         }
-        System.out.println(solution);
+        System.out.print(solution);
         solution = "";
         System.out.print(B.getRows()+" "+ B.getCols()+" ");
         for (int i = 0; i < B.getRows(); i++) {
             for (int j = 0; j <  B.getCols(); j++) 
-                solution += B.getElement(i, j) + " ";
+                solution += B.getIntElement(i, j) + " ";
         }
-        System.out.println(solution);
+        System.out.print(solution);
     }
 }
