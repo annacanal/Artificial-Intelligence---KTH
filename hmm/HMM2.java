@@ -18,7 +18,7 @@ public class HMM2 {
             try{
                 //System.out.println("Reading input...");
             	//reader = new BufferedReader(new InputStreamReader(System.in));
-                reader = new BufferedReader(new FileReader("src/hmm/input2_2.txt"));
+                reader = new BufferedReader(new FileReader("src/hmm/input2.txt"));
 
                 // read and fill matrix A
                 line = reader.readLine();
@@ -60,17 +60,15 @@ public class HMM2 {
                 // Initialize alpha matrix
                 delta = new Matrix(A.getRows(), O.getRows());
                 delta_idx = new Matrix(A.getRows(), O.getRows());
-              //  delta.fillColumn(pi.mult_column(B, O.getIntElement(0,0)),0);   
-                delta.fillColumn(pi.mult_column_log(B, O.getIntElement(0,0)),0); 
-               // delta.show();
+                delta.fillColumn(pi.mult_column(B, O.getIntElement(0,0)),0);   
+              //  delta.fillColumn(pi.mult_column_log(B, O.getIntElement(0,0)),0);    
                 // delta_idx first column is -1 (we don't care)
                 delta_idx.fillColumnSameNumber(-1,delta_idx.getRows(),0);
                 //delta_idx.show();
                 Matrix aux = new Matrix(A.getCols(),1);
-            //    double temp_max = 0.0;
-               double temp_max = Double.NEGATIVE_INFINITY;
-              //  double current = 0.0;
-                double current = Double.NEGATIVE_INFINITY;
+                double temp_max = 0.0;
+               // double temp_max = -100;
+                double current = 0.0;
                 int max_state = -1;
                 
                 
@@ -78,39 +76,35 @@ public class HMM2 {
                 for (int i = 1; i < O.getRows(); i++){
                 	/* System.out.print("Valor i: ");
                 	 System.out.println(i);*/
-                	 
                     for (int j = 0; j < A.getCols(); j++){
                     	/* System.out.print("Valor j: ");
                     	 System.out.println(j);*/
-                    	// temp_max = 0.0;
-                    	 temp_max = Double.NEGATIVE_INFINITY;
-                    	
+                    	 temp_max = 0.0;
+                    	//temp_max = -100;
                         for (int k = 0; k < A.getRows(); k++){
-                        	/*System.out.print("Valor k: ");
+                        /*	System.out.print("Valor k: ");
                         	 System.out.println(k);*/
-                        	// current = A.getElement(k, j)*delta.getElement(k, i-1);
-                        	current = Math.log10(A.getElement(k, j)) + delta.getElement(k, i-1);
-                        	/*System.out.println("current:");
-                        	System.out.println(current);*/
-                            if(temp_max < current){
+                        	 current = A.getElement(k, j)*delta.getElement(k, i-1);
+                        	//current = Math.log(A.getElement(j, k)) + delta.getElement(k, i-1);
+                          //  System.out.println(current);
+                            if(temp_max<current){
                                 temp_max = current;
                                 max_state = k;
                             }
-                          /*  System.out.print("Valor max_current: ");
+                         /*   System.out.print("Valor max_current: ");
                             System.out.println(temp_max);*/
-                        }/*
+                        }
                         if (temp_max * B.getElement(j, O.getIntElement(i, 0)) == 0){  	
                         	max_state = -1; //I don't care, 
-                        }*/
-                        if (temp_max + Math.log10( B.getElement(j, O.getIntElement(i, 0))) == Double.NEGATIVE_INFINITY){  	
+                        }/*
+                        if (temp_max + Math.log( B.getElement(j, O.getIntElement(i, 0))) == 0){  	
                         	max_state = -1; //I don't care, 
-                        }
+                        }*/
                         delta_idx.setValue(j, i, max_state);
                         aux.setValue(j, 0, temp_max);
                         //multiply by B-column according to observation
-                      //  delta.fillColumn(aux.mult_column(B, O.getIntElement(i, 0)),i);
-                        delta.fillColumn(aux.plus_column_log(B, O.getIntElement(i, 0)),i);
-               
+                        delta.fillColumn(aux.mult_column(B, O.getIntElement(i, 0)),i);
+                      //  delta.fillColumn(aux.plus_column_log(B, O.getIntElement(j, O.getIntElement(i,0))),i);
                         
                     }
                     
@@ -122,8 +116,7 @@ public class HMM2 {
                 
                 // Decide most probable state sequence
                 Matrix sequence = new Matrix(1,O.getRows());
-              //  double max = 0.0;  
-                double max = Double.NEGATIVE_INFINITY;     
+                double max = 0.0;     
                 //last position
                 for (int i = 0; i < delta.getRows(); i++){
                     if(delta.getElement(i, delta.getCols()-1)>max){

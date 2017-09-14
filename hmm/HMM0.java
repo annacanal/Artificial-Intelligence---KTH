@@ -1,7 +1,7 @@
 package hmm;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.InputStreamReader;
 
 public class HMM0 {
 
@@ -15,8 +15,8 @@ public class HMM0 {
             //readInput(A,B,pi);
             try{
                 
-                //reader = new BufferedReader(new InputStreamReader(System.in));
-                reader = new BufferedReader(new FileReader("src/hmm/input0.txt"));
+                reader = new BufferedReader(new InputStreamReader(System.in));
+                //reader = new BufferedReader(new FileReader("src/hmm/input0.txt"));
 
                 // read and fill matrix A
                 line = reader.readLine();
@@ -25,7 +25,7 @@ public class HMM0 {
                 cols = Integer.parseInt(buf[1]);
                 A = new Matrix(rows, cols);
                 A.fillMatrix(buf, 2);
-                A.show();
+                //A.show();
 
                 // read and fill matrix B
                 line = reader.readLine();
@@ -34,7 +34,7 @@ public class HMM0 {
                 cols = Integer.parseInt(buf[1]);
                 B = new Matrix(rows, cols);
                 B.fillMatrix(buf, 2);
-                B.show();
+                //B.show();
 
                 // read and fill matrix pi
                 line = reader.readLine();
@@ -43,7 +43,7 @@ public class HMM0 {
                 cols = Integer.parseInt(buf[1]);
                 pi = new Matrix(rows, cols);
                 pi.fillMatrix(buf, 2);
-                pi.show();
+                //pi.show();
                 
                 // compute observation probabilities
                 result = pi.multiply(A).multiply(B);
