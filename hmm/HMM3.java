@@ -16,8 +16,8 @@ public class HMM3 {
             //readInput(A,B,pi);
             try {
                 //System.out.println("Reading input...");
-                reader = new BufferedReader(new InputStreamReader(System.in));
-                //reader = new BufferedReader(new FileReader("src/hmm/input3.txt"));
+                //reader = new BufferedReader(new InputStreamReader(System.in));
+                reader = new BufferedReader(new FileReader("src/hmm/input3.txt"));
 
                 // read and fill matrix A
                 line = reader.readLine();
