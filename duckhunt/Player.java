@@ -1,4 +1,7 @@
-package duckhunt;
+//package Duck;
+
+
+import java.util.Random;
 
 class Player {
     private final Specie[] species = new Specie[Constants.COUNT_SPECIES];
@@ -72,17 +75,34 @@ class Player {
     public void reveal(GameState pState, int[] pSpecies, Deadline pDue) {
         for(int i=0; i<pSpecies.length; i++){
             Matrix O = getObservationsFromBird(pState.getBird(i));
-            species[pSpecies[i]].BaumWelch(O);
+            species[pSpecies[i]].Baum_Welch(O);
         }
     }
     
     
+	public int find_specie(Bird bird){
+		double max = 0.0;
+		double prob_specie;
+		int specie = -1;
+		
+		for(int i = 0; i < Constants.COUNT_SPECIES; i++){ 
+            prob_specie = species[i].forward(getObservationsFromBird(bird));
+            if (prob_specie > max){
+            	max = prob_specie;
+            	specie = i;
+            }
+        }
+		return specie;
+		 
+	}
     public Matrix getObservationsFromBird(Bird bird){
         int[] observations = new int [bird.getSeqLength()];
+        int len = 0;
         for(int j = 0; j < bird.getSeqLength() && bird.wasAlive(j); j++){
             observations[j] = bird.getObservation(j);
+            len++;
         }
-        Matrix O = new Matrix(observations,j+1);
+        Matrix O = new Matrix(observations,len);
         return O;
     }
     public static final Action cDontShoot = new Action(-1, -1);
