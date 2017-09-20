@@ -11,6 +11,65 @@ final public class Matrix {
         this.N = N;
         data = new double[M][N];
     }
+    
+    public Matrix(int [] data, int length){
+        this.M = length;
+        this.N = 1;
+        this.data = new double [M][N];
+        for(int i = 0; i<M; i++){
+            this.data[i][0] = data[i];
+        }
+    }
+    
+    // create matrix based on 2d array
+    public Matrix(double[][] data) {
+        M = data.length;
+        N = data[0].length;
+        this.data = new double[M][N];
+        for (int i = 0; i < M; i++)
+            for (int j = 0; j < N; j++)
+                    this.data[i][j] = data[i][j];
+    }
+    
+    public static Matrix random(int M, int N) {
+        Matrix A = new Matrix(M, N);
+        double acum, init;
+        
+        for (int i = 0; i < M; i++){
+        	acum = 0.0;
+        	init = 0.5;
+            for (int j = 0; j < N-1; j++){
+                A.data[i][j] = Math.random()*(1-acum-init);
+            	acum +=  A.data[i][j];
+            }
+            A.data[i][N-1] = 1-acum;
+        }
+        
+        return A;
+    }
+
+    
+    public static Matrix initialize(int M, int N) {
+        Matrix A = new Matrix(M, N);
+        for (int i = 0; i < M; i++)
+            for (int j = 0; j < N; j++){
+                if(j==i){
+                	A.data[i][j] = 0.7;
+                }else{
+                	A.data[i][j]= 0.3/(N-1);
+                }
+            }
+        return A;
+    }
+    
+    public static Matrix initialize_equal(int M, int N) {
+        Matrix A = new Matrix(M, N);
+        for (int i = 0; i < M; i++)
+            for (int j = 0; j < N; j++){
+                A.data[i][j]= 1.0/N;
+    		}  
+        return A;
+    }
 
     // GETTERS
     public int getRows (){
@@ -61,7 +120,12 @@ final public class Matrix {
             data[i][col] = B.getElement(i, 0);
         }
     }
-    
+    // fill column with values from a column matrix
+    public void fillColumnSameNumber (double num, int num_rows, int col){
+        for (int i=0; i < num_rows; i++){
+            data[i][col] = num;
+        }
+    }
     
     // create and return the transpose of the invoking matrix
     public Matrix transpose() {
@@ -80,6 +144,17 @@ final public class Matrix {
         for (int i = 0; i < M; i++)
             for (int j = 0; j < N; j++)
                 C.data[i][j] = A.data[i][j] + B.data[i][j];
+        return C;
+    }
+
+     // return C = A + log(B) 
+    public Matrix plus_column_log(Matrix B,  int col) {
+        Matrix A = this;
+       // if (B.M != A.M || B.N != A.N) throw new RuntimeException("Illegal matrix dimensions.");
+        Matrix C = new Matrix(B.M, 1);
+        for (int i = 0; i < B.M; i++){
+        	C.data[i][0] = A.data[i][0] + Math.log10(B.data[i][col]);
+    	}
         return C;
     }
 
@@ -116,17 +191,33 @@ final public class Matrix {
         return C;
     }
     
+    
     // return C = A * B[:][col] (multiplies by a column of B, elementwise)
     public Matrix mult_column(Matrix B, int col){
         Matrix A = this;
         if(A.N > 1 && A.M > 1){
-            System.out.println("First matrix has to be a row or a column.");
+           // System.out.println("First matrix has to be a row or a column.");
         }else if(A.N>1){ //if it is a row
             A = A.transpose();
         }
         Matrix C = new Matrix (B.M, 1);
         for (int i = 0; i< B.M; i++){
             C.data[i][0] = A.data[i][0] * B.data[i][col];
+        }
+        return C;
+    }
+    
+    // return C = log( A * B[:][col]) (multiplies by a column of B, elementwise)
+    public Matrix mult_column_log(Matrix B, int col){
+        Matrix A = this;
+        if(A.N > 1 && A.M > 1){
+           // System.out.println("First matrix has to be a row or a column.");
+        }else if(A.N>1){ //if it is a row
+            A = A.transpose();
+        }
+        Matrix C = new Matrix (B.M, 1);
+        for (int i = 0; i< B.M; i++){
+            C.data[i][0] = Math.log10(A.data[i][0]* B.data[i][col]);
         }
         return C;
     }
@@ -150,10 +241,10 @@ final public class Matrix {
     public void show() {
         for (int i = 0; i < M; i++) {
             for (int j = 0; j < N; j++) 
-                System.out.print(data[i][j]+" ");
-            System.out.println();
+                System.err.print(data[i][j]+" ");
+            System.err.println();
         }
-        System.out.println();
+        System.err.println();
     }
     
     //print matrix to HMM0 output
@@ -163,9 +254,17 @@ final public class Matrix {
             for (int j = 0; j < N; j++) 
                 solution += data[i][j] + " ";
         }
-        System.out.print(solution);
+        System.err.print(solution);
     }
     
+    public double sum(){
+    	 double solution = 0.0;
+         for (int i = 0; i < M; i++) {
+             for (int j = 0; j < N; j++) 
+                 solution += data[i][j];
+         }
+         return solution;
+    }
     //print matrix to HMM1 output: sums up all elements and prints
     public void showHMM1solution(){
         double solution = 0.0;
@@ -173,10 +272,10 @@ final public class Matrix {
             for (int j = 0; j < N; j++) 
                 solution += data[i][j];
         }
-        System.out.println(solution);
+        System.err.println(solution);
     }
     
-    //print matrix to HMM2 output
+    //print matrix to HMM2 output 
     public void showHMM2solution(){
         String solution = "";
         for (int i = 0; i < M; i++) {
@@ -184,5 +283,23 @@ final public class Matrix {
                 solution += this.getIntElement(i, j) + " ";
         }
         System.out.print(solution);
+    }
+    
+    //print matrix A and B to HMM3 output
+    public void showHMM3solution(Matrix B){
+        String solution = "";
+        System.out.print(M+" "+ N+" ");
+        for (int i = 0; i < M; i++) {
+            for (int j = 0; j < N; j++) 
+                solution += data[i][j] + " ";
+        }
+        System.out.println(solution);
+        solution = "";
+        System.out.print(B.getRows()+" "+ B.getCols()+" ");
+        for (int i = 0; i < B.getRows(); i++) {
+            for (int j = 0; j <  B.getCols(); j++) 
+                solution += B.getElement(i, j) + " ";
+        }
+        System.out.println(solution);
     }
 }
