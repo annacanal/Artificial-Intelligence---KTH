@@ -1,5 +1,6 @@
+//package tictactoe.Java_skeletons.TTT;
 import java.util.*;
-import jdk.nashorn.internal.runtime.arrays.ArrayData;
+//import jdk.nashorn.internal.runtime.arrays.ArrayData;
 
 public class Player {
     /**
@@ -11,9 +12,11 @@ public class Player {
      *            time before which we must have returned
      * @return the next state the board is in after our move
      */
+	private int thisPlayer;
     public GameState play(final GameState gameState, final Deadline deadline) {
         Vector<GameState> nextStates = new Vector<GameState>();
         gameState.findPossibleMoves(nextStates);
+        
 
         if (nextStates.size() == 0) {
             // Must play "pass" move if there are no other moves possible.
@@ -25,40 +28,59 @@ public class Player {
          * the best next state. This skeleton returns a random move instead.
          */
         
-        Random random = new Random();
-        return nextStates.elementAt(minimax(gameState, Constants.CELL_X));
+        //Random random = new Random();
+        int depth = 3;
+        thisPlayer = gameState.getNextPlayer();
+        Pair result = alpha_beta(gameState, thisPlayer,depth,Integer.MIN_VALUE,Integer.MAX_VALUE);
+        return nextStates.elementAt(result.index);
     }
 
 
-    public int minimax (GameState gameState, int player){
-        if (gameState.isEOG()){
-            return utility(gameState, player);
+    
+    public Pair alpha_beta (GameState gameState, int player, int depth, int alpha, int beta){
+        int v=0;
+        Pair result = new Pair (-1, -1);
+        Pair aux;
+        if (gameState.isEOG() || depth == 0){
+            return new Pair(-1,utility(gameState,player));
         }else{
             Vector<GameState> nextStates = new Vector<GameState>();
             gameState.findPossibleMoves(nextStates);
-            if(player == Constants.CELL_X){
-                int bestPossible = Integer.MIN_VALUE;
-                int v;
-                for(int i = 0; i<nextStates.size(); i++){
-                    v = minimax(nextStates.get(i),Constants.CELL_O);
-                    bestPossible = max(bestPossible, v);
+            boolean no_prune = true;
+            if(player == thisPlayer){
+                v = Integer.MIN_VALUE;
+                for(int i = 0; i<nextStates.size() && no_prune; i++){
+                    aux = alpha_beta(nextStates.get(i), nextStates.get(i).getNextPlayer(), depth-1, alpha, beta);
+                    if(v<aux.value){
+                        v=aux.value;
+                        result = new Pair(i, v); 
+                    }
+                    alpha = max(alpha, v);
+                    if (beta<=alpha){
+                        no_prune = false;
+                    }
                 }
-                return bestPossible;
-            }else if(player == Constants.CELL_O){
-                int bestPossible = Integer.MAX_VALUE;
-                int v;
-                for(int i = 0; i<nextStates.size(); i++){
-                    v = minimax(nextStates.get(i),Constants.CELL_X);
-                    bestPossible = min(bestPossible, v);
-                }
-                return bestPossible;
             }else{
-                System.err.println("Hi ha un error, nano!");
-                return -1;
+                v = Integer.MAX_VALUE;
+                for(int i = 0; i<nextStates.size(); i++){
+                    aux = alpha_beta(nextStates.get(i), nextStates.get(i).getNextPlayer(), depth-1, alpha, beta);
+                    if(v>aux.value){
+                    	v=aux.value;
+                    	result = new Pair(i, v);
+                    }
+                    beta = min(beta, v);
+                    if(alpha<=beta){
+                        no_prune = false;
+                    }
+                }
             }
+            return result;
             
         }
     }
+    
+    
+  
     
     public int utility(GameState gameState, int player){
         int score = 0;
@@ -70,10 +92,13 @@ public class Player {
         //evaluate diagonals
         score += evaluate_diagonal1(gameState);
         score += evaluate_diagonal2(gameState);
+        if(gameState.isXWin()&&player == Constants.CELL_X){
+            score += 10000;
+        }else if(gameState.isOWin()&&player == Constants.CELL_O){
+            score += -10000;
         
-
-        
-        return -1;
+        }
+        return score;
     }
     
     public int evaluate_diagonal1(GameState gameState){
@@ -86,7 +111,7 @@ public class Player {
             
             if(gameState.at(1, 1)==Constants.CELL_X){
                 if(score == 1){
-                    score = 2;
+                    score = 10;
                 }else if (score == -1){
                     return 0;
                 }else{
@@ -94,7 +119,7 @@ public class Player {
                 }
             }else if(gameState.at(1, 1)==Constants.CELL_O){
                 if(score == -1){
-                    score = -2;
+                    score = -10;
                 }else if (score == 1){
                     return 0;
                 }else{
@@ -104,7 +129,7 @@ public class Player {
             
             if(gameState.at(2, 2)==Constants.CELL_X){
                 if(score > 0){
-                    score++;
+                    score*=10;
                 }else if (score == -1){
                     return 0;
                 }else{
@@ -112,7 +137,7 @@ public class Player {
                 }
             }else if(gameState.at(2, 2)==Constants.CELL_O){
                 if(score < 0){
-                    score--;
+                    score*=10;
                 }else if (score == 1){
                     return 0;
                 }else{
@@ -122,7 +147,7 @@ public class Player {
             
             if(gameState.at(3, 3)==Constants.CELL_X){
                 if(score > 0){
-                    score++;
+                    score*=10;
                 }else if (score == -1){
                     return 0;
                 }else{
@@ -130,7 +155,7 @@ public class Player {
                 }
             }else if(gameState.at(3, 3)==Constants.CELL_O){
                 if(score < 0){
-                    score--;
+                    score*=10;
                 }else if (score == 1){
                     return 0;
                 }else{
@@ -151,7 +176,7 @@ public class Player {
 
         if(gameState.at(1, 2)==Constants.CELL_X){
             if(score == 1){
-                score = 2;
+                score = 10;
             }else if (score == -1){
                 return 0;
             }else{
@@ -159,7 +184,7 @@ public class Player {
             }
         }else if(gameState.at(1, 2)==Constants.CELL_O){
             if(score == -1){
-                score = -2;
+                score = -10;
             }else if (score == 1){
                 return 0;
             }else{
@@ -169,7 +194,7 @@ public class Player {
 
         if(gameState.at(2, 1)==Constants.CELL_X){
             if(score > 0){
-                score++;
+                score*=10;
             }else if (score == -1){
                 return 0;
             }else{
@@ -177,7 +202,7 @@ public class Player {
             }
         }else if(gameState.at(2, 1)==Constants.CELL_O){
             if(score < 0){
-                score--;
+                score*=10;
             }else if (score == 1){
                 return 0;
             }else{
@@ -187,7 +212,7 @@ public class Player {
 
         if(gameState.at(3, 0)==Constants.CELL_X){
             if(score > 0){
-                score++;
+                score*=10;
             }else if (score == -1){
                 return 0;
             }else{
@@ -195,7 +220,7 @@ public class Player {
             }
         }else if(gameState.at(3, 0)==Constants.CELL_O){
             if(score < 0){
-                score--;
+                score*=10;
             }else if (score == 1){
                 return 0;
             }else{
@@ -216,7 +241,7 @@ public class Player {
 
         if(gameState.at(row, 1)==Constants.CELL_X){
             if(score == 1){
-                score = 2;
+                score = 10;
             }else if (score == -1){
                 return 0;
             }else{
@@ -224,7 +249,7 @@ public class Player {
             }
         }else if(gameState.at(row, 1)==Constants.CELL_O){
             if(score == -1){
-                score = -2;
+                score = -10;
             }else if (score == 1){
                 return 0;
             }else{
@@ -234,7 +259,7 @@ public class Player {
 
         if(gameState.at(row, 2)==Constants.CELL_X){
             if(score > 0){
-                score++;
+                score*=10;
             }else if (score == -1){
                 return 0;
             }else{
@@ -242,7 +267,7 @@ public class Player {
             }
         }else if(gameState.at(row, 2)==Constants.CELL_O){
             if(score < 0){
-                score--;
+                score*=10;
             }else if (score == 1){
                 return 0;
             }else{
@@ -252,7 +277,7 @@ public class Player {
 
         if(gameState.at(row, 3)==Constants.CELL_X){
             if(score > 0){
-                score++;
+                score*=10;
             }else if (score == -1){
                 return 0;
             }else{
@@ -260,7 +285,7 @@ public class Player {
             }
         }else if(gameState.at(row, 3)==Constants.CELL_O){
             if(score < 0){
-                score--;
+                score*=10;
             }else if (score == 1){
                 return 0;
             }else{
@@ -281,7 +306,7 @@ public class Player {
 
         if(gameState.at(1, col)==Constants.CELL_X){
             if(score == 1){
-                score = 2;
+                score = 10;
             }else if (score == -1){
                 return 0;
             }else{
@@ -289,7 +314,7 @@ public class Player {
             }
         }else if(gameState.at(1, col)==Constants.CELL_O){
             if(score == -1){
-                score = -2;
+                score = -10;
             }else if (score == 1){
                 return 0;
             }else{
@@ -299,7 +324,7 @@ public class Player {
 
         if(gameState.at(2, col)==Constants.CELL_X){
             if(score > 0){
-                score++;
+                score*=10;
             }else if (score == -1){
                 return 0;
             }else{
@@ -307,7 +332,7 @@ public class Player {
             }
         }else if(gameState.at(2,col)==Constants.CELL_O){
             if(score < 0){
-                score--;
+                score*=10;
             }else if (score == 1){
                 return 0;
             }else{
@@ -317,7 +342,7 @@ public class Player {
 
         if(gameState.at(3, col)==Constants.CELL_X){
             if(score > 0){
-                score++;
+                score*=10;
             }else if (score == -1){
                 return 0;
             }else{
@@ -325,7 +350,7 @@ public class Player {
             }
         }else if(gameState.at(3, col)==Constants.CELL_O){
             if(score < 0){
-                score--;
+                score*=10;
             }else if (score == 1){
                 return 0;
             }else{
