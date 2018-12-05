@@ -1,2 +1,2 @@
-# sturdy-octo-spork
-Just to try
+# Artificial Intelligence
+Assignments from Artificial Intelligence course at KTH
